@@ -1,10 +1,13 @@
 const { createClient } = require('@supabase/supabase-js')
-const corsHeaders = {'Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'GET, POST, DELETE, OPTIONS','Access-Control-Allow-Headers':'Content-Type', 'Authorization'}
+const corsHeaders = {'Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'GET, POST, DELETE, OPTIONS','Access-Control-Allow-Headers':'Content-Type, Authorization'}
 function isAdmin(event){const token=(event.headers['authorization']||event.headers['Authorization']||'').split(' ')[1]||'';const expected=process.env.ADMIN_TOKEN||'';return expected&&token&&token===expected}
 exports.handler=async(event)=>{
   if(event.httpMethod==='OPTIONS'){return{statusCode:200,headers:corsHeaders,body:'ok'}}
-  const s=createClient(process.env.SUPABASE_URL,process.env.SUPABASE_SERVICE_ROLE);
+  const url=process.env.SUPABASE_URL, key=process.env.SUPABASE_SERVICE_ROLE
+  if(!url||!key){ return { statusCode:500, headers:corsHeaders, body: JSON.stringify({ error:'Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE' }) } }
+  const s=createClient(url,key)
   const admin=event.queryStringParameters&&event.queryStringParameters.admin==='1';
+
   if(event.httpMethod==='GET'){
     const cols=admin?'id,name,count,created_at':'name,count';
     if(admin&&!isAdmin(event))return{statusCode:401,headers:corsHeaders,body:JSON.stringify({error:'Unauthorized'})};
@@ -18,9 +21,11 @@ exports.handler=async(event)=>{
     }
     return{statusCode:200,headers:corsHeaders,body:JSON.stringify({rows:data})}
   }
+
   if(event.httpMethod==='POST'){
     try{
-      const {name,count}=JSON.parse(event.body||'{}');
+      const {name,count,agreed}=JSON.parse(event.body||'{}');
+      if(!agreed) return {statusCode:400,headers:corsHeaders,body:JSON.stringify({error:'waiver not accepted'})}
       if(!name)return{statusCode:400,headers:corsHeaders,body:JSON.stringify({error:'Name required'})};
       const safe=Number(count)||1;
       const {error}=await s.from('rsvps').insert([{name,count:safe}]);
@@ -30,6 +35,7 @@ exports.handler=async(event)=>{
       return{statusCode:500,headers:corsHeaders,body:JSON.stringify({error:e.message})}
     }
   }
+
   if(event.httpMethod==='DELETE'){
     if(!isAdmin(event))return{statusCode:401,headers:corsHeaders,body:JSON.stringify({error:'Unauthorized'})};
     try{
@@ -42,5 +48,6 @@ exports.handler=async(event)=>{
       return{statusCode:500,headers:corsHeaders,body:JSON.stringify({error:e.message})}
     }
   }
+
   return{statusCode:405,headers:corsHeaders,body:'Method Not Allowed'}
 }

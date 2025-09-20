@@ -5,7 +5,7 @@ exports.handler=async(event)=>{
   const url = process.env.SUPABASE_URL
   const key = process.env.SUPABASE_SERVICE_ROLE
   if(!url || !key){ return { statusCode:500, headers:corsHeaders, body: JSON.stringify({ error:'Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE' }) } }
-  const s=require('@supabase/supabase-js').createClient(url,key)
+  const s=createClient(url,key)
   if(event.httpMethod==='GET'){
     const {data,error}=await s.from('claims').select('item,claimed')
     if(error)return{statusCode:500,headers:corsHeaders,body:JSON.stringify({error:error.message})}

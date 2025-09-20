@@ -17,7 +17,7 @@ export default function Admin(){
       const data = await res.json()
       setRows(data.rows || [])
     }catch(e){
-      setError('Could not load (check admin token)')
+      setError('Could not load (check admin token or functions)')
     }
   }
 
@@ -69,7 +69,7 @@ export default function Admin(){
         </div>
 
         <label className="block mb-4">
-          <span className="text-sm font-medium">Admin Token (from Netlify env ADMIN_TOKEN)</span>
+          <span className="text-sm font-medium">Admin Token (Netlify env: ADMIN_TOKEN)</span>
           <input type="password" className="border p-2 rounded w-full" value={token} onChange={e=>setToken(e.target.value)} placeholder="Paste token to unlock" />
         </label>
 
