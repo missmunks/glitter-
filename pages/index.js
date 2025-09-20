@@ -8,8 +8,9 @@ export default function Home(){
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [claimed, setClaimed] = useState({})
+  const [newItem, setNewItem] = useState('')
 
-  const items = [
+  const itemsSeed = [
 `Apple slices (red + green varieties)`,
 `Pear wedges`,
 `Marshmallows (giant, mini, or rainbow swirl)`,
@@ -38,6 +39,8 @@ export default function Home(){
 `Cornbread cubes (sticky-sweet + southern twist)`
   ]
 
+  const [items, setItems] = useState(itemsSeed)
+
   async function loadAll(){
     try{
       setError('')
@@ -49,7 +52,14 @@ export default function Home(){
       const claimsData = await claimsRes.json()
       setGuests(rsvpData.rows || [])
       const map = {}
-      for(const row of (claimsData.rows||[])){ map[row.item] = !!row.claimed }
+      const serverItems = new Set()
+      for(const row of (claimsData.rows||[])){
+        map[row.item] = !!row.claimed
+        serverItems.add(row.item)
+      }
+      // merge server items (including any custom additions) into local list
+      const merged = Array.from(new Set([...serverItems, ...itemsSeed]))
+      setItems(merged)
       setClaimed(map)
     }catch(e){ setError('Could not load data (ensure functions are deployed via Git)') }
   }
@@ -82,25 +92,45 @@ export default function Home(){
     }catch{}
   }
 
+  async function addItem(e){
+    e.preventDefault()
+    const item = newItem.trim()
+    if(!item) return
+    setNewItem('')
+    setItems(prev => prev.includes(item) ? prev : [...prev, item])
+    setClaimed(p=>({ ...p, [item]: false }))
+    try{
+      await fetch('/.netlify/functions/checklist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ item, claimed: false })
+      })
+    }catch{}
+  }
+
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-yellow-50 to-pink-50">
-      {/* Chaos art */}
-      <img src="/img/paint-splat.svg" className="absolute -top-10 -left-4 w-60 opacity-80 rotate-12 glitter" alt="" />
-      <img src="/img/glitter.svg" className="absolute top-24 right-6 w-64 opacity-70 glitter" alt="" />
-      <img src="/img/apple.svg" className="absolute bottom-10 left-10 w-24" alt="" />
-      <img src="/img/hotdog.svg" className="absolute bottom-8 right-6 w-32" alt="" />
-      <img src="/img/teeter.svg" className="absolute top-52 left-1/2 -translate-x-1/2 w-64" alt="" />
-      <img src="/img/zipline.svg" className="absolute top-4 left-0 w-72" alt="" />
-      <img src="/img/fountain.svg" className="absolute bottom-0 left-1/2 -translate-x-1/2 w-56 opacity-70" alt="" />
-      <img src="/img/marshmallow.svg" className="absolute top-10 left-1/4 w-16" alt="" />
-      <img src="/img/sprinkles.svg" className="absolute bottom-24 right-1/3 w-40" alt="" />
+      {/* Background art kept away from text zones */}
+      <div className="bg-art pointer-events-none select-none absolute inset-0 -z-10">
+        <img src="/img/paint-splat.svg" className="absolute -top-10 -left-6 w-60 opacity-70 rotate-12" alt="" />
+        <img src="/img/glitter.svg" className="absolute top-24 right-6 w-64 opacity-60" alt="" />
+        <img src="/img/zipline.svg" className="absolute top-6 left-2 w-72 opacity-80" alt="" />
+        <img src="/img/fountain.svg" className="absolute bottom-0 left-1/2 -translate-x-1/2 w-64 opacity-70" alt="" />
+        <img src="/img/marshmallow.svg" className="absolute top-24 left-1/4 w-16 opacity-80" alt="" />
+        <img src="/img/sprinkles.svg" className="absolute bottom-24 right-1/3 w-40 opacity-70" alt="" />
+      </div>
 
-      <main className="relative z-10 max-w-4xl mx-auto p-6">
-        <h1 className="text-6xl font-extrabold text-center mb-1">🍏 Caramel Chaos Party 🎉</h1>
-        <p className="text-center text-lg mb-4">Sunday, October 21 — Bring a pumpkin to paint + a topping to share!</p>
-        <p className="text-center text-base mb-6"><strong>Where:</strong> 1741 San Fernando Rd • <strong>Call:</strong> <a className="underline" href="tel:18054235433">805-423-5433</a> • <a className="underline" href="mailto:mucktruck@duck.com">Email questions</a></p>
+      <main className="relative z-10 max-w-4xl mx-auto p-6 space-y-6">
+        <div className="text-center">
+          <h1 className="text-6xl font-extrabold mb-1">🍏 Caramel Chaos Party 🎉</h1>
+          <p className="text-center text-base mb-3">Sunday, October 21 — Bring a pumpkin to paint + a topping to share!</p>
+          <div className="flex justify-center gap-3">
+            <a className="px-4 py-2 rounded-full bg-emerald-600 text-white" href="sms:+18054235433?body=Hi!%20Question%20about%20the%20Caramel%20Chaos%20Party">Text us</a>
+            <a className="px-4 py-2 rounded-full bg-indigo-600 text-white" href="mailto:mucktruck@duck.com?subject=Caramel%20Chaos%20Party%20Question">Email us</a>
+          </div>
+        </div>
 
-        <section className="bg-white/90 backdrop-blur p-6 rounded-2xl shadow-xl mb-6 border-4 border-pink-300 rotate-1">
+        <section className="section-card backdrop-blur p-6 rounded-2xl shadow-xl border-4 border-pink-300 rotate-1">
           <h2 className="text-2xl font-bold mb-3">RSVP</h2>
           <form onSubmit={submit} className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <input value={name} onChange={e=>setName(e.target.value)} placeholder="Your Name" className="border p-2 rounded" />
@@ -113,8 +143,12 @@ export default function Home(){
           </ul>
         </section>
 
-        <section className="bg-white/90 backdrop-blur p-6 rounded-2xl shadow-xl mb-6 border-4 border-yellow-300 -rotate-1">
+        <section className="section-card backdrop-blur p-6 rounded-2xl shadow-xl border-4 border-yellow-300 -rotate-1">
           <h2 className="text-2xl font-bold mb-3">Suggestions to Bring</h2>
+          <form onSubmit={addItem} className="flex gap-2 mb-4">
+            <input value={newItem} onChange={e=>setNewItem(e.target.value)} placeholder="Add your own item (persists)" className="border p-2 rounded flex-1" />
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Add</button>
+          </form>
           <ul className="space-y-2">
             {items.map((item)=>(
               <li key={item} className="flex items-center gap-2">

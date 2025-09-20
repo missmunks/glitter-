@@ -1,10 +1,11 @@
-# Caramel Chaos Party — MAX EDITION
-- Fun art (paint splat, glitter, hot dogs, teeter totter, zip line, marshmallows, chocolate fountain)
-- Persistent checklist via Supabase (`claims` table)
-- RSVP storage + Admin with token
-- Long waiver with gradual shrinking to tiny text
+# Caramel Chaos Party — v2
+- Persistent checklist (including **custom additions**) via Supabase `claims` table.
+- Removed images: teeter-totter, hot dog, bottom fruit.
+- No text overlays on images (cards are opaque and elevated).
+- Release page: one long string of unique text, gradually shrinking inline; includes non-liability for tree falls, injuries, and sticky/lost items.
+- Replaced address with **Text us** (SMS) + **Email** buttons.
 
-## Supabase SQL
+## Supabase SQL (run once)
 ```sql
 create extension if not exists pgcrypto;
 create table if not exists public.rsvps (
@@ -19,7 +20,6 @@ create table if not exists public.claims (
   updated_at timestamptz not null default now()
 );
 ```
-
 ## Netlify env vars
 - SUPABASE_URL
 - SUPABASE_SERVICE_ROLE

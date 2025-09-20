@@ -67,17 +67,28 @@ export default function Admin(){
           <h1 className="text-3xl font-bold">Admin — RSVPs</h1>
           <Link href="/" className="underline text-blue-600">← Back to site</Link>
         </div>
+
         <label className="block mb-4">
           <span className="text-sm font-medium">Admin Token (from Netlify env ADMIN_TOKEN)</span>
           <input type="password" className="border p-2 rounded w-full" value={token} onChange={e=>setToken(e.target.value)} placeholder="Paste token to unlock" />
         </label>
+
         <div className="flex gap-2 mb-4">
           <button onClick={load} className="bg-blue-600 text-white px-4 py-2 rounded">Refresh</button>
           <button onClick={downloadCSV} className="bg-emerald-600 text-white px-4 py-2 rounded">Download CSV</button>
         </div>
+
         {error && <p className="text-red-600 mb-3">{error}</p>}
+
         <table className="w-full border">
-          <thead><tr className="bg-gray-100"><th className="p-2 border">Name</th><th className="p-2 border">Count</th><th className="p-2 border">Created</th><th className="p-2 border w-24">Action</th></tr></thead>
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="p-2 border">Name</th>
+              <th className="p-2 border">Count</th>
+              <th className="p-2 border">Created</th>
+              <th className="p-2 border w-24">Action</th>
+            </tr>
+          </thead>
           <tbody>
             {rows.map(r => (
               <tr key={r.id}>
@@ -91,6 +102,7 @@ export default function Admin(){
             ))}
           </tbody>
         </table>
+
         <p className="mt-4 font-semibold">Total people expected: {total}</p>
       </div>
     </div>
