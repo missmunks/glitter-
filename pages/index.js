@@ -211,10 +211,10 @@ export default function Home(){
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-yellow-50 to-pink-50">
       <div className="bg-art pointer-events-none select-none absolute inset-0 -z-10">
-        <img src="/img/apple-splat.svg" className="absolute -top-10 -left-6 w-64 opacity-70 rotate-12" alt="" />
-        <img src="/img/marshmallow-stick.svg" className="absolute top-24 left-6 w-40 opacity-80 -rotate-6" alt="" />
-        <img src="/img/fountain.svg" className="absolute bottom-0 left-1/2 -translate-x-1/2 w-64 opacity-70" alt="" />
-        <img src="/img/glitter.svg" className="absolute top-16 right-10 w-52 opacity-70" alt="" />
+        <img src="/img/apple-splat.svg" className="absolute -top-10 -left-6 w-72 opacity-80 rotate-6" alt="" />
+        <img src="/img/marshmallow-stick.svg" className="absolute top-10 left-28 w-44 opacity-90 -rotate-12" alt="" />
+        <img src="/img/fountain.svg" className="absolute bottom-0 left-1/2 -translate-x-1/2 w-72 opacity-70" alt="" />
+        <img src="/img/glitter.svg" className="absolute top-16 right-10 w-56 opacity-70" alt="" />
       </div>
 
       <main className="relative z-10 max-w-4xl mx-auto p-6 space-y-6">
@@ -232,7 +232,8 @@ export default function Home(){
           </div>
         </div>
 
-        <section className="section-card backdrop-blur p-6 rounded-2xl shadow-xl border-4 border-pink-300 rotate-1">
+        {/* TOP (RSVP) tilted */}
+        <section className="section-card backdrop-blur p-6 rounded-2xl shadow-xl border-4 border-pink-300 rotate-2">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold mb-3">RSVP</h2>
             <div className="flex items-center gap-2">
@@ -252,7 +253,8 @@ export default function Home(){
           </ul>
         </section>
 
-        <section className="section-card backdrop-blur p-6 rounded-2xl shadow-xl border-4 border-yellow-300 -rotate-1">
+        {/* BOTTOM (Suggestions) flat */}
+        <section className="section-card backdrop-blur p-6 rounded-2xl shadow-xl border-4 border-yellow-300">
           <h2 className="text-2xl font-bold mb-3">Suggestions to Bring</h2>
           <form onSubmit={addItem} className="flex gap-2 mb-4">
             <input value={newItem} onChange={e=>setNewItem(e.target.value)} placeholder="Add your own item (persists)" className="border p-2 rounded flex-1" />
