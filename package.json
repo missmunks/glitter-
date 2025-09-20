@@ -1,21 +1,15 @@
 {
-  "name": "caramel-chaos-party",
-  "version": "8.0.0",
+  "name": "event-waiver-rsvp",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+    "dev": "netlify dev",
+    "build": "echo 'No build step required'",
+    "init-db": "node netlify/functions/_init_local_db.js"
   },
   "dependencies": {
-    "next": "14.2.5",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "@supabase/supabase-js": "2.45.4"
-  },
-  "devDependencies": {
-    "tailwindcss": "3.4.4",
-    "postcss": "8.4.38",
-    "autoprefixer": "10.4.19"
+    "pg": "^8.11.5",
+    "nodemailer": "^6.9.8",
+    "twilio": "^4.21.0"
   }
 }
