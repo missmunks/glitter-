@@ -1,8 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 240">
-  <defs><radialGradient id="p" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#ffa7d1"/><stop offset="100%" stop-color="#ff4d8f"/></radialGradient></defs>
-  <path fill="url(#p)" d="M150 10c16 0 18 28 36 34s48-12 52 2-18 30-16 46 28 32 16 46-38-2-52 4-20 34-36 34-18-28-36-34-48 12-52-2 18-30 16-46-28-32-16-46 38 2 52-4 20-34 36-34z"/>
-  <!-- Apple -->
-  <circle cx="130" cy="80" r="24" fill="#e53935"/>
-  <rect x="127" y="55" width="6" height="14" rx="2" fill="#795548"/>
-  <path d="M133 55c10-12 23-10 30-6-9 6-18 10-30 6z" fill="#43a047"/>
+  <defs>
+    <radialGradient id="spl" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#ffc2e0"/><stop offset="100%" stop-color="#ff3d8a"/>
+    </radialGradient>
+  </defs>
+  <path fill="url(#spl)" d="M150 18c18 0 21 28 41 35s54-13 58 3-20 33-17 50 31 35 17 51-42-2-58 5-23 36-41 36-21-28-41-36-54 13-58-3 20-33 17-50-31-35-17-51 42 2 58-5 23-36 41-36z"/>
+  <!-- apple -->
+  <circle cx="126" cy="86" r="26" fill="#d32f2f"/>
+  <rect x="123" y="58" width="6" height="16" rx="2" fill="#6d4c41"/>
+  <path d="M129 58c10-12 24-10 30-6-8 6-18 10-30 6z" fill="#2e7d32"/>
+  <circle cx="132" cy="80" r="3" fill="#fff" opacity="0.8"/>
 </svg>

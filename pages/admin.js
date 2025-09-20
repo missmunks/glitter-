@@ -75,7 +75,7 @@ export default function Admin(){
 
         <div className="flex gap-2 mb-4">
           <button onClick={load} className="bg-blue-600 text-white px-4 py-2 rounded">Refresh</button>
-          <button onClick={downloadCSV} className="bg-emerald-600 text-white px-4 py-2 rounded">Download CSV</button>
+          <button className="bg-emerald-600 text-white px-4 py-2 rounded" onClick={downloadCSV}>Download CSV</button>
         </div>
 
         {error && <p className="text-red-600 mb-3">{error}</p>}

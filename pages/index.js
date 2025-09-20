@@ -136,19 +136,25 @@ export default function Home(){
   const [newItem, setNewItem] = useState('')
   const [saveState, setSaveState] = useState('')
   const [agreed, setAgreed] = useState(false)
+  const [allergies, setAllergies] = useState([])
+  const [allergyName, setAllergyName] = useState('')
+  const [allergyNote, setAllergyNote] = useState('')
 
   useEffect(()=>{ setAgreed(typeof window!=='undefined' && localStorage.getItem(AGREED_KEY)==='1') }, [])
 
   async function loadAll(){
     try{ setError('')
-      const [rsvpRes, claimsRes] = await Promise.all([
+      const [rsvpRes, claimsRes, allergyRes] = await Promise.all([
         fetch('/.netlify/functions/rsvp'),
-        fetch('/.netlify/functions/checklist')
+        fetch('/.netlify/functions/checklist'),
+        fetch('/.netlify/functions/allergies')
       ])
-      if(!rsvpRes.ok || !claimsRes.ok) throw new Error('Functions not reachable')
+      if(!rsvpRes.ok || !claimsRes.ok || !allergyRes.ok) throw new Error('Functions not reachable')
       const rsvpData = await rsvpRes.json()
       const claimsData = await claimsRes.json()
+      const allergyData = await allergyRes.json()
       setGuests(rsvpData.rows || [])
+      setAllergies(allergyData.rows || [])
       const map = {}
       const serverItems = new Set()
       for(const row of (claimsData.rows||[])){ map[row.item] = !!row.claimed; serverItems.add(row.item) }
@@ -208,18 +214,38 @@ export default function Home(){
     }catch(e){ setSaveState('error'); setItems(prev=>prev.filter(x=>x!==item)); const cp={...claimed}; delete cp[item]; setClaimed(cp) }
   }
 
+  async function addAllergy(e){
+    e.preventDefault()
+    const nm = allergyName.trim()
+    const note = allergyNote.trim()
+    if(!note) return
+    try{
+      const res = await fetch('/.netlify/functions/allergies', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: nm || 'Guest', note })
+      })
+      if(!res.ok) throw new Error('bad')
+      setAllergyName(''); setAllergyNote('')
+      await loadAll()
+    }catch(e){
+      alert('Could not save allergy (check env keys & functions)')
+    }
+  }
+
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-yellow-50 to-pink-50">
       <div className="bg-art pointer-events-none select-none absolute inset-0 -z-10">
-        <img src="/img/apple-splat.svg" className="absolute -top-10 -left-6 w-72 opacity-80 rotate-6" alt="" />
-        <img src="/img/marshmallow-stick.svg" className="absolute top-10 left-28 w-44 opacity-90 -rotate-12" alt="" />
+        <img src="/img/apple-splat.svg" className="absolute -top-10 -left-6 w-72 opacity-90 rotate-6" alt="" />
+        <img src="/img/marshmallow-stick.svg" className="absolute top-6 left-28 w-48 opacity-95 -rotate-12" alt="" />
         <img src="/img/fountain.svg" className="absolute bottom-0 left-1/2 -translate-x-1/2 w-72 opacity-70" alt="" />
         <img src="/img/glitter.svg" className="absolute top-16 right-10 w-56 opacity-70" alt="" />
       </div>
 
       <main className="relative z-10 max-w-4xl mx-auto p-6 space-y-6">
         <div className="text-center">
-          <h1 className="text-5xl md:text-6xl font-extrabold mb-1">🍏 Caramel Apple / Pumpkin Art / Chaos 🎉</h1>
+          <p className="kicker text-pink-600">Caramel Apple / Pumpkin Art / Chaos</p>
+          <h1 className="text-5xl md:text-6xl font-extrabold mb-1">🍏 Party Time 🎉</h1>
           <p className="text-center text-base mb-3">Sunday, October 21 — Bring a pumpkin to paint + a topping to share!</p>
           {!agreed && (
             <div className="bg-yellow-100 text-yellow-900 border border-yellow-300 rounded-lg p-3 inline-block">
@@ -253,7 +279,7 @@ export default function Home(){
           </ul>
         </section>
 
-        {/* BOTTOM (Suggestions) flat */}
+        {/* Suggestions flat */}
         <section className="section-card backdrop-blur p-6 rounded-2xl shadow-xl border-4 border-yellow-300">
           <h2 className="text-2xl font-bold mb-3">Suggestions to Bring</h2>
           <form onSubmit={addItem} className="flex gap-2 mb-4">
@@ -266,6 +292,22 @@ export default function Home(){
                 <input type="checkbox" checked={!!claimed[item]} onChange={()=>toggle(item)} />
                 <span className={claimed[item] ? 'line-through opacity-70' : ''}>{item}</span>
               </li>
+            ))}
+          </ul>
+        </section>
+
+        {/* Allergies */}
+        <section className="section-card backdrop-blur p-6 rounded-2xl shadow-xl border-4 border-red-300">
+          <h2 className="text-2xl font-bold mb-3">I have an allergy! <span aria-hidden>🛟</span></h2>
+          <p className="text-sm text-gray-700 mb-3">Share helpful info so the snack bar stays friendly. (Examples: “Peanuts”, “Dairy”, “Gluten”, “Gelatin”, “Food dye #40”.)</p>
+          <form onSubmit={addAllergy} className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+            <input value={allergyName} onChange={e=>setAllergyName(e.target.value)} placeholder="Your name (optional)" className="border p-2 rounded" />
+            <input value={allergyNote} onChange={e=>setAllergyNote(e.target.value)} placeholder="Allergy / note (required)" className="border p-2 rounded md:col-span-1" />
+            <button className="bg-rose-600 hover:bg-rose-700 text-white p-2 rounded">Add allergy</button>
+          </form>
+          <ul className="space-y-1">
+            {allergies.map((a,i)=>(
+              <li key={i}>🛟 <strong>{a.name || 'Guest'}</strong>: {a.note}</li>
             ))}
           </ul>
         </section>
