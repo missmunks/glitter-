@@ -19,15 +19,6 @@ exports.handler = async (event) => {
 
   const SUPABASE_URL = process.env.SUPABASE_URL
   const SUPABASE_SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE
-
-  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE) {
-    return {
-      statusCode: 500,
-      headers: corsHeaders,
-      body: JSON.stringify({ error: 'Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE env vars' })
-    }
-  }
-
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE)
 
   const adminMode = event.queryStringParameters && event.queryStringParameters.admin === '1'
@@ -42,16 +33,12 @@ exports.handler = async (event) => {
       .from('rsvps')
       .select(selectCols)
       .order('created_at', { ascending: true })
-    if (error) {
-      return { statusCode: 500, headers: corsHeaders, body: JSON.stringify({ error: error.message }) }
-    }
+    if (error) return { statusCode: 500, headers: corsHeaders, body: JSON.stringify({ error: error.message }) }
 
     if ((event.queryStringParameters || {}).format === 'csv') {
       const header = adminMode ? ['id','name','count','created_at'] : ['name','count']
       const rows = [header.join(',')]
-      for (const row of data) {
-        rows.push(header.map(k => row[k] ?? '').join(','))
-      }
+      for (const row of data) rows.push(header.map(k => row[k] ?? '').join(','))
       return {
         statusCode: 200,
         headers: { ...corsHeaders, 'Content-Type': 'text/csv', 'Content-Disposition': 'attachment; filename="rsvps.csv"' },
@@ -66,8 +53,8 @@ exports.handler = async (event) => {
     try {
       const { name, count } = JSON.parse(event.body || '{}')
       if (!name) return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Name required' }) }
-      const safeCount = Number(count) || 1
-      const { error } = await supabase.from('rsvps').insert([{ name, count: safeCount }])
+      const safe = Number(count) || 1
+      const { error } = await supabase.from('rsvps').insert([{ name, count: safe }])
       if (error) throw error
       return { statusCode: 200, headers: corsHeaders, body: JSON.stringify({ ok: true }) }
     } catch (e) {
