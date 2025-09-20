@@ -51,7 +51,7 @@ export default function Home(){
       const map = {}
       for(const row of (claimsData.rows||[])){ map[row.item] = !!row.claimed }
       setClaimed(map)
-    }catch(e){ setError('Could not load data') }
+    }catch(e){ setError('Could not load data (ensure functions are deployed via Git)') }
   }
   useEffect(()=>{ loadAll() }, [])
 
@@ -83,15 +83,22 @@ export default function Home(){
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden p-6 bg-gradient-to-br from-yellow-50 to-pink-50">
-      {/* Fun background images */}
-      <img src="/img/paint-splat.svg" alt="" className="pointer-events-none select-none w-56 h-56 absolute -top-10 -left-6 opacity-70 rotate-12" />
-      <img src="/img/glitter.svg"     alt="" className="pointer-events-none select-none w-64 h-64 absolute top-24 right-6 opacity-60" />
-      <img src="/img/apple.svg"       alt="" className="pointer-events-none select-none w-24 h-24 absolute bottom-10 left-10" />
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-yellow-50 to-pink-50">
+      {/* Chaos art */}
+      <img src="/img/paint-splat.svg" className="absolute -top-10 -left-4 w-60 opacity-80 rotate-12 glitter" alt="" />
+      <img src="/img/glitter.svg" className="absolute top-24 right-6 w-64 opacity-70 glitter" alt="" />
+      <img src="/img/apple.svg" className="absolute bottom-10 left-10 w-24" alt="" />
+      <img src="/img/hotdog.svg" className="absolute bottom-8 right-6 w-32" alt="" />
+      <img src="/img/teeter.svg" className="absolute top-52 left-1/2 -translate-x-1/2 w-64" alt="" />
+      <img src="/img/zipline.svg" className="absolute top-4 left-0 w-72" alt="" />
+      <img src="/img/fountain.svg" className="absolute bottom-0 left-1/2 -translate-x-1/2 w-56 opacity-70" alt="" />
+      <img src="/img/marshmallow.svg" className="absolute top-10 left-1/4 w-16" alt="" />
+      <img src="/img/sprinkles.svg" className="absolute bottom-24 right-1/3 w-40" alt="" />
 
-      <main className="relative z-10 max-w-3xl mx-auto">
-        <h1 className="text-5xl font-extrabold text-center mb-2">🍏 Caramel Chaos Party 🎉</h1>
-        <p className="text-center mb-6 text-lg">Sunday, October 21 — Bring a pumpkin to paint + a topping to share!</p>
+      <main className="relative z-10 max-w-4xl mx-auto p-6">
+        <h1 className="text-6xl font-extrabold text-center mb-1">🍏 Caramel Chaos Party 🎉</h1>
+        <p className="text-center text-lg mb-4">Sunday, October 21 — Bring a pumpkin to paint + a topping to share!</p>
+        <p className="text-center text-base mb-6"><strong>Where:</strong> 1741 San Fernando Rd • <strong>Call:</strong> <a className="underline" href="tel:18054235433">805-423-5433</a> • <a className="underline" href="mailto:mucktruck@duck.com">Email questions</a></p>
 
         <section className="bg-white/90 backdrop-blur p-6 rounded-2xl shadow-xl mb-6 border-4 border-pink-300 rotate-1">
           <h2 className="text-2xl font-bold mb-3">RSVP</h2>
