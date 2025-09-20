@@ -87,7 +87,6 @@ export default function Home(){
   )
 }
 
-import { useState } from 'react'
 function Checklist(){
   const [claimed, setClaimed] = useState({})
   const items = [
