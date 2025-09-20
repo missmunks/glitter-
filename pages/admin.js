@@ -64,7 +64,7 @@ export default function Admin(){
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-6">
       <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow p-6">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-3xl font-bold">Admin — RSVPs</h1>
+          <h1 className="text-3xl font-bold">Admin — Caramel Apple / Pumpkin Art / Chaos</h1>
           <Link href="/" className="underline text-blue-600">← Back to site</Link>
         </div>
 

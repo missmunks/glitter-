@@ -4,4 +4,5 @@
 
 body { font-family: system-ui, -apple-system, Segoe UI, Roboto, 'Comic Sans MS', cursive, sans-serif; }
 .bg-art img { filter: drop-shadow(0 0 6px rgba(255,215,0,.5)); }
-.section-card { background: rgba(255,255,255,0.94); }
+.section-card { background: rgba(255,255,255,0.96); }
+.badge { font-size: 12px; padding: 2px 8px; border-radius: 9999px; }

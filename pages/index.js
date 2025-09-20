@@ -1,5 +1,128 @@
+
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+
+const itemsSeed = [
+  "Apple slices",
+  "Pear wedges",
+  "Marshmallows",
+  "Rice Krispie treats",
+  "Pretzel rods",
+  "Pretzel twists",
+  "Pretzel sticks",
+  "Angel food cake cubes",
+  "Pound cake bites",
+  "Graham crackers",
+  "Teddy Grahams",
+  "Mini donuts",
+  "Donut holes",
+  "Waffle cone chunks",
+  "Brownie bites",
+  "Potato chips",
+  "Cheese cubes",
+  "Twinkies",
+  "Little Debbie snack cakes",
+  "Dried mango",
+  "Dried apricots",
+  "Dried figs",
+  "Banana chips",
+  "Dried cranberries",
+  "Frozen banana slices",
+  "Mini pancakes",
+  "Mini waffles",
+  "Churro bites",
+  "Popcorn balls",
+  "Caramel corn clusters",
+  "Fortune cookies",
+  "Rice cakes",
+  "Saltines",
+  "Ritz crackers",
+  "Pita chips",
+  "Graham pita chips",
+  "Bugles",
+  "Cinnamon rolls",
+  "Cornbread cubes",
+  "Chopped peanuts",
+  "Almonds",
+  "Pecans",
+  "Cashews",
+  "Walnuts",
+  "Crushed Oreos",
+  "Crumbled graham crackers",
+  "Crushed pretzels",
+  "Granola",
+  "Toffee bits",
+  "Corn flakes",
+  "Fruity Pebbles",
+  "Fruit Loops",
+  "Cap\u2019n Crunch",
+  "Lucky Charms marshmallows",
+  "Rainbow sprinkles",
+  "Star sprinkles",
+  "Heart sprinkles",
+  "Nerds",
+  "Pop Rocks",
+  "Skittles minis",
+  "M&Ms",
+  "Cotton candy bits",
+  "Edible glitter",
+  "Luster dust",
+  "Sour gummy worms",
+  "Gummy bears",
+  "Mini marshmallows",
+  "Shredded coconut",
+  "White chocolate chips",
+  "Dark chocolate chips",
+  "Butterscotch chips",
+  "Cinnamon sugar",
+  "Crushed candy canes",
+  "Caramel drizzle",
+  "Cookie crumbs",
+  "Nilla wafers",
+  "Biscoff",
+  "Chocolate chip cookies",
+  "Churro dust",
+  "Reeses Pieces",
+  "Peanut butter cups",
+  "Dried cranberry bits",
+  "Crushed banana chips",
+  "Marshmallow fluff drizzle",
+  "Strawberries",
+  "Pineapple chunks",
+  "Grapes",
+  "Orange wedges",
+  "Clementine segments",
+  "Kiwi slices",
+  "Raspberries",
+  "Blackberries",
+  "Dried dates",
+  "Coconut chunks",
+  "Chips Ahoy",
+  "Mini chocolate chip cookies",
+  "Shortbread cookies",
+  "Biscotti",
+  "Cheesecake cubes",
+  "Mini churros",
+  "Mini Pop-Tarts",
+  "Stroopwafels",
+  "Pringles",
+  "Cocoa Pebbles",
+  "Apple Jacks",
+  "Swedish Fish",
+  "Sour Patch Kids",
+  "Twizzlers",
+  "Candy canes",
+  "Lollipops",
+  "Eggo bites",
+  "Pancake bites",
+  "Pop-Tarts chunks",
+  "Ice cream cones",
+  "Mini muffins",
+  "Cereal bars",
+  "Granola bars",
+  "Puffed rice cakes",
+  "S\u2019mores station"
+];
 
 export default function Home(){
   const [name, setName] = useState('')
@@ -8,38 +131,9 @@ export default function Home(){
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [claimed, setClaimed] = useState({})
-  const [newItem, setNewItem] = useState('')
-
-  const itemsSeed = [
-`Apple slices (red + green varieties)`,
-`Pear wedges`,
-`Marshmallows (giant, mini, or rainbow swirl)`,
-`Rice Krispie treats (cut in fun shapes)`,
-`Pretzel rods, pretzel twists, pretzel sticks`,
-`Angel food cake cubes`,
-`Pound cake bites`,
-`Graham crackers / Teddy Grahams`,
-`Mini donuts or donut holes`,
-`Waffle cone chunks`,
-`Brownie bites`,
-`Potato chips (kettle style, Ruffles, or even Pringles!)`,
-`Cheese cubes (the brave combo — caramel + sharp cheddar is surprisingly good)`,
-`Twinkies or Little Debbie snack cakes`,
-`Dried fruits: mango, apricots, figs, banana chips, cranberries`,
-`Frozen banana slices`,
-`Mini pancakes or waffles`,
-`Churro bites`,
-`Popcorn balls / caramel corn clusters`,
-`Fortune cookies (crunch + caramel = wow)`,
-`Rice cakes (break into pieces)`,
-`Saltines or Ritz crackers (sweet + salty)`,
-`Pita chips or graham pita chips`,
-`Bugles (caramel “cones”)`,
-`Cinnamon rolls (mini or cut-up pieces)`,
-`Cornbread cubes (sticky-sweet + southern twist)`
-  ]
-
   const [items, setItems] = useState(itemsSeed)
+  const [newItem, setNewItem] = useState('')
+  const [saveState, setSaveState] = useState('') // '', 'saving', 'saved', 'error'
 
   async function loadAll(){
     try{
@@ -48,20 +142,16 @@ export default function Home(){
         fetch('/.netlify/functions/rsvp'),
         fetch('/.netlify/functions/checklist')
       ])
+      if(!rsvpRes.ok || !claimsRes.ok) throw new Error('Functions not reachable')
       const rsvpData = await rsvpRes.json()
       const claimsData = await claimsRes.json()
       setGuests(rsvpData.rows || [])
       const map = {}
       const serverItems = new Set()
-      for(const row of (claimsData.rows||[])){
-        map[row.item] = !!row.claimed
-        serverItems.add(row.item)
-      }
-      // merge server items (including any custom additions) into local list
-      const merged = Array.from(new Set([...serverItems, ...itemsSeed]))
-      setItems(merged)
+      for(const row of (claimsData.rows||[])){ map[row.item] = !!row.claimed; serverItems.add(row.item) }
+      setItems(Array.from(new Set([...serverItems, ...itemsSeed])))
       setClaimed(map)
-    }catch(e){ setError('Could not load data (ensure functions are deployed via Git)') }
+    }catch(e){ setError('Could not load from database. Check Netlify env keys & functions.'); }
   }
   useEffect(()=>{ loadAll() }, [])
 
@@ -83,13 +173,20 @@ export default function Home(){
   async function toggle(item){
     const next = !claimed[item]
     setClaimed(p=>({ ...p, [item]: next }))
+    setSaveState('saving')
     try{
-      await fetch('/.netlify/functions/checklist', {
+      const res = await fetch('/.netlify/functions/checklist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ item, claimed: next })
       })
-    }catch{}
+      if(!res.ok) throw new Error('bad')
+      setSaveState('saved')
+      setTimeout(()=>setSaveState(''),1500)
+    }catch(e){
+      setSaveState('error')
+      setClaimed(p=>({ ...p, [item]: !next }))
+    }
   }
 
   async function addItem(e){
@@ -97,20 +194,28 @@ export default function Home(){
     const item = newItem.trim()
     if(!item) return
     setNewItem('')
-    setItems(prev => prev.includes(item) ? prev : [...prev, item])
+    if(!items.includes(item)) setItems(prev=>[...prev, item])
     setClaimed(p=>({ ...p, [item]: false }))
+    setSaveState('saving')
     try{
-      await fetch('/.netlify/functions/checklist', {
+      const res = await fetch('/.netlify/functions/checklist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ item, claimed: false })
       })
-    }catch{}
+      if(!res.ok) throw new Error('bad')
+      setSaveState('saved')
+      setTimeout(()=>setSaveState(''),1500)
+    }catch(e){
+      setSaveState('error')
+      setItems(prev=>prev.filter(x=>x!==item))
+      const cp = {...claimed}; delete cp[item]; setClaimed(cp)
+    }
   }
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-yellow-50 to-pink-50">
-      {/* Background art kept away from text zones */}
+      {/* Decorative background only (no text overlap) */}
       <div className="bg-art pointer-events-none select-none absolute inset-0 -z-10">
         <img src="/img/paint-splat.svg" className="absolute -top-10 -left-6 w-60 opacity-70 rotate-12" alt="" />
         <img src="/img/glitter.svg" className="absolute top-24 right-6 w-64 opacity-60" alt="" />
@@ -122,16 +227,23 @@ export default function Home(){
 
       <main className="relative z-10 max-w-4xl mx-auto p-6 space-y-6">
         <div className="text-center">
-          <h1 className="text-6xl font-extrabold mb-1">🍏 Caramel Chaos Party 🎉</h1>
+          <h1 className="text-5xl md:text-6xl font-extrabold mb-1">🍏 Caramel Apple / Pumpkin Art / Chaos 🎉</h1>
           <p className="text-center text-base mb-3">Sunday, October 21 — Bring a pumpkin to paint + a topping to share!</p>
           <div className="flex justify-center gap-3">
-            <a className="px-4 py-2 rounded-full bg-emerald-600 text-white" href="sms:+18054235433?body=Hi!%20Question%20about%20the%20Caramel%20Chaos%20Party">Text us</a>
-            <a className="px-4 py-2 rounded-full bg-indigo-600 text-white" href="mailto:mucktruck@duck.com?subject=Caramel%20Chaos%20Party%20Question">Email us</a>
+            <a className="px-4 py-2 rounded-full bg-emerald-600 text-white" href="sms:+18054235433?body=Hi!%20Question%20about%20the%20Caramel%20Apple%20/%20Pumpkin%20Art%20/%20Chaos%20party">Text</a>
+            <a className="px-4 py-2 rounded-full bg-indigo-600 text-white" href="mailto:mucktruck@duck.com?subject=Caramel%20Apple%20/%20Pumpkin%20Art%20/%20Chaos%20Question">Email</a>
           </div>
         </div>
 
         <section className="section-card backdrop-blur p-6 rounded-2xl shadow-xl border-4 border-pink-300 rotate-1">
-          <h2 className="text-2xl font-bold mb-3">RSVP</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold mb-3">RSVP</h2>
+            <div className="flex items-center gap-2">
+              {saveState==='saving' && <span className="badge bg-yellow-200 text-yellow-900">Saving…</span>}
+              {saveState==='saved' && <span className="badge bg-green-200 text-green-900">Saved</span>}
+              {saveState==='error' && <span className="badge bg-red-200 text-red-900">Not saved</span>}
+            </div>
+          </div>
           <form onSubmit={submit} className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <input value={name} onChange={e=>setName(e.target.value)} placeholder="Your Name" className="border p-2 rounded" />
             <input type="number" min="1" value={count} onChange={e=>setCount(e.target.value)} placeholder="# of people" className="border p-2 rounded" />
